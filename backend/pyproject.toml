@@ -1,0 +1,53 @@
+[project]
+name = "triage-desk"
+version = "0.1.0"
+description = "Self-hosted GitHub PR triage bot for Semgrep OSS findings"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "httpx>=0.27",
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "psycopg[binary]>=3.2",
+  "celery>=5.4",
+  "redis>=5.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "fakeredis>=2.23", "ruff>=0.6", "mypy>=1.11", "bandit>=1.7"]
+scan = ["semgrep>=1.79"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["triage_desk*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: needs docker compose services (skipped by default)"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "N"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "N802"]
+"alembic/*" = ["N", "E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+exclude = ["alembic/", "tests/"]
+
+[[tool.mypy.overrides]]
+module = ["triage_desk.worker"]
+disable_error_code = ["untyped-decorator"]
