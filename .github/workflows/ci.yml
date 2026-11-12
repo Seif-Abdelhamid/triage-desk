@@ -1,0 +1,75 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: triage
+          POSTGRES_PASSWORD: triage
+          POSTGRES_DB: triage_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U triage" --health-interval 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev,scan]"
+      - name: Ruff
+        run: ruff check . && ruff format --check .
+      - name: Mypy (strict)
+        run: mypy triage_desk
+      - name: Pytest (SQLite)
+        run: pytest -q
+      - name: Pytest (PostgreSQL, incl. append-only audit trigger)
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg://triage:triage@localhost:5432/triage_test
+          TEST_POSTGRES_URL: postgresql+psycopg://triage:triage@localhost:5432/triage_test
+        run: pytest -q
+      - name: Bandit
+        run: bandit -q -r triage_desk
+
+  dashboard:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dashboard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=high
+
+  semgrep-self-scan:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test the project's own rules
+        run: semgrep --test semgrep-rules/
+      - name: Scan this repo (project rules + registry rulesets)
+        run: >-
+          semgrep scan --error --metrics=off
+          --config semgrep-rules/triage-desk.yml
+          --config p/python --config p/typescript --config p/secrets --config p/dockerfile
