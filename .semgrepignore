@@ -1,0 +1,5 @@
+node_modules/
+dashboard/dist/
+backend/tests/
+semgrep-rules/*.py
+semgrep-rules/*.tsx

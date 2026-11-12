@@ -1,0 +1,36 @@
+rules:
+  - id: hmac-digest-compared-with-equals
+    languages: [python]
+    severity: ERROR
+    message: >-
+      HMAC digests must be compared with hmac.compare_digest; '==' leaks timing
+      information an attacker can use to forge webhook signatures byte by byte.
+    pattern-either:
+      - pattern: $H.hexdigest() == $X
+      - pattern: $X == $H.hexdigest()
+      - pattern: $H.digest() == $X
+      - pattern: $X == $H.digest()
+      - pattern: $H.hexdigest() != $X
+      - pattern: $X != $H.hexdigest()
+
+  - id: subprocess-shell-true
+    languages: [python]
+    severity: ERROR
+    message: The worker handles attacker-controlled file names; never run subprocesses through a shell.
+    pattern-either:
+      - pattern: subprocess.$F(..., shell=True, ...)
+      - pattern: os.system(...)
+
+  - id: sqlalchemy-text-fstring
+    languages: [python]
+    severity: ERROR
+    message: Build SQL with bound parameters, not f-strings inside text().
+    pattern-either:
+      - pattern: sqlalchemy.text(f"...")
+      - pattern: text(f"...")
+
+  - id: react-dangerously-set-inner-html
+    languages: [typescript]
+    severity: ERROR
+    message: Finding data (rule ids, paths, messages, reasons) is untrusted; render it as text.
+    pattern: <$EL dangerouslySetInnerHTML={...} />
