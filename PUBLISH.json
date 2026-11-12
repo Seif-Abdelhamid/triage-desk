@@ -1,0 +1,6 @@
+{
+  "name": "triage-desk",
+  "description": "Self-hosted GitHub PR bot: Semgrep findings as review comments, /triage commands, RBAC, audit trail, dashboard",
+  "topics": ["semgrep", "sast", "github-app", "fastapi", "celery", "postgresql", "react", "typescript", "static-analysis", "appsec"],
+  "tests_passed": true
+}
