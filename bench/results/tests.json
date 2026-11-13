@@ -1,0 +1,25 @@
+{
+  "backend": {
+    "command": "pytest --cov=triage_desk",
+    "passed": 129,
+    "skipped": 2,
+    "failed": 0,
+    "skip_reasons": [
+      "tests/test_integration_compose.py:29: needs `docker compose up` (set TRIAGE_DESK_E2E=1)",
+      "tests/test_migrations.py:34: TEST_POSTGRES_URL not set"
+    ],
+    "line_coverage_percent": 93.51,
+    "statements": 1140,
+    "missing": 74
+  },
+  "dashboard": {
+    "command": "npm ci && npx vitest run --coverage",
+    "passed": 18,
+    "failed": 0,
+    "exit_code": 0,
+    "line_coverage_percent": 98.18,
+    "lines": "54/55",
+    "statement_coverage_percent": 92.95,
+    "branch_coverage_percent": 92.85
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "n": 10000,
+  "percentile": "nearest-rank",
+  "verify_signature_small": {
+    "body_bytes": 186,
+    "accepted": 10000,
+    "median_us": 2.88,
+    "p95_us": 3.0
+  },
+  "verify_signature_25KiB": {
+    "body_bytes": 25786,
+    "accepted": 10000,
+    "median_us": 20.54,
+    "p95_us": 26.79
+  },
+  "endpoint": {
+    "what": "POST /webhook via TestClient: HMAC + delivery-id insert + enqueue",
+    "first_delivery_accepted": 10000,
+    "first_median_us": 1610.7,
+    "first_p95_us": 1867.2,
+    "replays_sent": 10000,
+    "replays_rejected": 10000,
+    "replay_median_us": 1702.0,
+    "forged_sent": 10000,
+    "forged_rejected_401": 10000,
+    "forged_median_us": 1287.9,
+    "forged_p95_us": 1485.8,
+    "scans_enqueued_total": 10000
+  }
+}

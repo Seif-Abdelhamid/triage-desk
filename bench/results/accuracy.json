@@ -1,0 +1,34 @@
+{
+  "sample_size": 40,
+  "population": 66,
+  "sample_strata": {
+    "tainted": 20,
+    "not_tainted": 20
+  },
+  "population_strata": {
+    "not_tainted": 45,
+    "tainted": 21
+  },
+  "seed": 0,
+  "reviewers": 1,
+  "tainted_vs_in_function_truth": {
+    "tp": 20,
+    "fp": 0,
+    "fn": 0,
+    "tn": 20,
+    "precision": 1.0,
+    "recall": 1.0
+  },
+  "tainted_vs_any_path_truth": {
+    "tp": 20,
+    "fp": 0,
+    "fn": 3,
+    "tn": 17,
+    "precision": 1.0,
+    "recall": 0.8696
+  },
+  "deprioritised_share_population": 0.6818,
+  "deprioritised_in_sample": 20,
+  "deprioritised_in_sample_truly_unreachable_in_function": 20,
+  "deprioritised_in_sample_reachable_via_caller": 3
+}
