@@ -1,0 +1,19 @@
+triage-desk benchmark  |  Apple M2  |  Python 3.12.13  |  semgrep 1.185.0
+--------------------------------------------------------------------------
+backend tests                  129 passed, 2 skipped  pytest
+backend line coverage                         93.51%  1140 stmts
+dashboard tests                            18 passed  vitest
+dashboard line coverage                       98.18%  54/55 lines
+semgrep p/python findings                         66  3 apps
+hint: tainted / not / unknown            21 / 45 / 0  n=66
+precision of tainted                           20/20  n=40 labelled
+recall, in-function                            20/20  n=40
+recall, incl. via caller                       20/23  n=40
+deprioritisable (not_tainted)                  45/66  all findings
+reaches() per finding                        1.24 ms  median, 5 runs
+run_scan, 10 files                            4.04 s  median of 5
+run_scan, 25 files                            4.05 s  median of 5
+run_scan, 50 files                            4.15 s  median of 5
+verify_signature, 186 B                      2.88 us  median, n=10000
+POST /webhook                                1.61 ms  median, n=10000
+replays rejected                         10000/10000  same delivery id
