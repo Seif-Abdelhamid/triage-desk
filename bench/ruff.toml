@@ -1,0 +1,5 @@
+extend = "../backend/pyproject.toml"
+
+[lint.per-file-ignores]
+# Fake secrets for local Settings, seeded (non-crypto) sampling, fixed argv lists, /tmp work dir.
+"*.py" = ["S106", "S108", "S311", "S603", "E402"]

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# ruff: noqa: S106, S311, S603  (fake test secrets, seeded sampling, fixed argv lists)
 """Reproducible benchmark for triage-desk.
 
 One command reproduces every number in BENCHMARK.md:
@@ -617,11 +616,89 @@ def step_webhook() -> dict[str, Any]:
 # ------------------------------------------------------------------ main
 
 
+def summary() -> None:
+    """Print the headline table from bench/results/*.json (no re-measurement)."""
+
+    def load(name: str) -> Any:
+        return json.loads((RESULTS / name).read_text())
+
+    env, tests, sem = load("environment.json"), load("tests.json"), load("semgrep.json")
+    reach, acc, scan, hook = (
+        load("reachability.json"),
+        load("accuracy.json"),
+        load("scan_job.json"),
+        load("webhook.json"),
+    )
+    b, d = tests["backend"], tests["dashboard"]
+    a, n = acc["tainted_vs_in_function_truth"], acc["tainted_vs_any_path_truth"]
+    lab = reach["labels"]
+    rows = [
+        ("backend tests", f"{b['passed']} passed, {b['skipped']} skipped", "pytest"),
+        ("backend line coverage", f"{b['line_coverage_percent']}%", f"{b['statements']} stmts"),
+        ("dashboard tests", f"{d['passed']} passed", "vitest"),
+        ("dashboard line coverage", f"{d['line_coverage_percent']}%", f"{d['lines']} lines"),
+        ("semgrep p/python findings", str(sem["total_findings"]), f"{len(sem['apps'])} apps"),
+        (
+            "hint: tainted / not / unknown",
+            f"{lab['tainted']} / {lab['not_tainted']} / {lab['unknown']}",
+            f"n={reach['findings']}",
+        ),
+        (
+            "precision of tainted",
+            f"{a['tp']}/{a['tp'] + a['fp']}",
+            f"n={acc['sample_size']} labelled",
+        ),
+        ("recall, in-function", f"{a['tp']}/{a['tp'] + a['fn']}", f"n={acc['sample_size']}"),
+        ("recall, incl. via caller", f"{n['tp']}/{n['tp'] + n['fn']}", f"n={acc['sample_size']}"),
+        (
+            "deprioritisable (not_tainted)",
+            f"{lab['not_tainted']}/{reach['findings']}",
+            "all findings",
+        ),
+        (
+            "reaches() per finding",
+            f"{reach['timing']['per_finding_us_median_of_medians'] / 1000:.2f} ms",
+            "median, 5 runs",
+        ),
+    ]
+    for k, v in scan["batches"].items():
+        rows.append((f"run_scan, {k} files", f"{v['job_seconds_median']:.2f} s", "median of 5"))
+    rows += [
+        (
+            "verify_signature, 186 B",
+            f"{hook['verify_signature_small']['median_us']} us",
+            f"median, n={hook['n']}",
+        ),
+        (
+            "POST /webhook",
+            f"{hook['endpoint']['first_median_us'] / 1000:.2f} ms",
+            f"median, n={hook['n']}",
+        ),
+        (
+            "replays rejected",
+            f"{hook['endpoint']['replays_rejected']}/{hook['endpoint']['replays_sent']}",
+            "same delivery id",
+        ),
+    ]
+    w0, w1 = max(len(r[0]) for r in rows), max(len(r[1]) for r in rows)
+    print(
+        f"triage-desk benchmark  |  {env['cpu']}  |  Python {env['python']}  |  "
+        f"semgrep {env['semgrep_cli']}"
+    )
+    print("-" * (w0 + w1 + 24))
+    for k, v, c in rows:
+        print(f"{k:<{w0}}  {v:>{w1}}  {c}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--workdir", type=Path, default=Path("/tmp/bench"))  # noqa: S108
+    ap.add_argument("--workdir", type=Path, default=Path("/tmp/bench"))
     ap.add_argument("--skip-tests", action="store_true", help="skip pytest / vitest coverage")
+    ap.add_argument("--summary", action="store_true", help="only print the saved results")
     args = ap.parse_args()
+    if args.summary:
+        summary()
+        return
     os.environ["PATH"] = env_with_venv()["PATH"]  # SemgrepCli resolves "semgrep" on PATH
     if shutil.which("semgrep") is None:
         raise SystemExit("semgrep not found next to this interpreter or on PATH")
@@ -650,6 +727,7 @@ def main() -> None:
     write("scan_job.json", step_scan(args.workdir, per_app, ruleset))
     write("webhook.json", step_webhook())
     log("done")
+    summary()
 
 
 if __name__ == "__main__":
