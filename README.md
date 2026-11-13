@@ -220,49 +220,6 @@ self-scan. The self-scan uses the project rules plus `p/python`,
 not be fetched in the sandbox where this was built, so the registry part of
 the scan first runs in CI.
 
-## How this was built
-
-This project was built with **Claude (Anthropic's AI assistant) in Claude
-Code**, as AI-assisted development. Seif Abdelhamid's brief set the target
-role, the problem and the stack. Claude wrote most of the code, tests and docs, and every
-commit carries a `Co-Authored-By: Claude` trailer. The design decisions below
-are the ones Seif should be able to defend without the code open.
-
-## What Seif should be able to explain
-
-1. **HMAC webhook verification.** Why the signature is computed over the raw
-   bytes and not over re-serialised JSON. Why `hmac.compare_digest` and not
-   `==`: a timing side channel lets an attacker recover the correct signature
-   one byte at a time. Why a missing secret fails closed.
-2. **Replay protection without timestamps.** GitHub doesn't sign a timestamp,
-   so the bot stores delivery IDs under a PK constraint, which also handles
-   two replicas racing. Why a bounded window is acceptable only because the
-   handlers are idempotent (head SHA, comment ID). Trade-off: a manual
-   "Redeliver" from GitHub reuses the same ID and gets ignored.
-3. **Why Celery and a queue at all.** GitHub expects a webhook response within
-   10 seconds and a scan takes minutes. Retries, `acks_late` plus
-   `reject_on_worker_lost` for at-least-once delivery, and why at-least-once
-   forces idempotent jobs.
-4. **The in-flight autoscaling signal.** Why queue depth goes to zero while
-   workers are busy. How prefetching hides work from the queue.
-   `ceil((depth + inflight) / target)`. Why stale in-flight entries get
-   pruned (SIGKILL means no postrun).
-5. **Reaching definitions on a CFG.** GEN/KILL, the worklist fixed point, why
-   the loop back edge makes a later assignment reach an earlier line, weak and
-   strong updates, the second fixed point for taint, and the limits: no
-   interprocedural analysis, name-based sources, no sanitisers.
-6. **RBAC on triage commands.** Authorisation comes from GitHub's
-   collaborator-permission API and not from the comment text. Why read-only
-   users are refused, why denied attempts are audited, and why cross-repo
-   `#id`s are ignored.
-7. **Schema design.** Current status on `findings` versus history in
-   `triage_events`. Fingerprints that survive line shifts. The append-only
-   trigger enforced in the database. The FP-rate denominator (triaged findings
-   only), and why "—" is shown instead of 0%.
-8. **Comment-command injection and PR-content attacks.** Strict first-line
-   grammar, reason sanitising (no `@` pings, no markdown or HTML), path
-   validation, `./` prefixes against CLI option injection, and `shell=False`.
-
 ## License
 
 MIT. See [LICENSE](LICENSE).
