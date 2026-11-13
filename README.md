@@ -1,5 +1,7 @@
 # triage-desk
 
+[![ci](https://github.com/Seif-Abdelhamid/triage-desk/actions/workflows/ci.yml/badge.svg)](https://github.com/Seif-Abdelhamid/triage-desk/actions/workflows/ci.yml)
+
 A self-hosted GitHub pull-request bot for **Semgrep OSS** findings. When a PR is
 opened or updated, it scans the changed files and posts each finding as an
 inline review comment. Reviewers triage a finding by replying in its thread:
@@ -28,6 +30,42 @@ noisy rules.
 > Status: portfolio project. It runs locally with `docker compose` and has a
 > full test suite. It has **not** been deployed for real users, and nothing
 > here reports production numbers.
+
+## Results
+
+These numbers come from one run of `python bench/run_benchmark.py` on an Apple
+M2 laptop (Python 3.12.13, Semgrep 1.185.0). Three intentionally vulnerable
+Python apps were scanned at pinned commits: pygoat, Vulnerable-Flask-App and
+dvpwa. Each number comes from a command that was run, not an estimate. For the
+method, the 40 hand labels and the limits, see [BENCHMARK.md](BENCHMARK.md).
+
+| Metric | Value | Sample / conditions |
+|---|---|---|
+| Backend tests | 129 passed, 2 skipped, **93.51 % line coverage** | `pytest --cov=triage_desk`; the skips need PostgreSQL / docker compose |
+| Dashboard tests | 18 passed, 98.18 % line coverage | `vitest run --coverage`, all files in `src/` |
+| Precision of the `tainted` hint | **100 % (20/20)** | 40 hand-labelled findings (one reviewer), 3 apps |
+| Recall of the `tainted` hint | 100 % (20/20) inside the function; **87.0 % (20/23)** counting flows through a caller | same 40 findings |
+| Findings a reviewer can deprioritise (`not_tainted`) | **45 of 66 (68.2 %)** | all `p/python` findings on the 3 apps; most are `app.run(debug=True)` lines |
+| Scan job end to end (GitHub faked, real Semgrep) | **4.04 s / 4.05 s / 4.15 s** for 10 / 25 / 50 changed files | median of 5 runs; Semgrep start-up is about 4.0 s of it |
+| Webhook replay protection | **10,000 of 10,000** replayed delivery IDs rejected; HMAC check 2.88 µs median | 10,000 requests, in-process |
+
+The hint is intraprocedural, and these apps are close to a best case for it.
+The numbers may not hold on production code. See the
+[limits](BENCHMARK.md#limits).
+
+<table>
+<tr><td><img src="docs/images/benchmark-summary.png" alt="Output of python bench/run_benchmark.py --summary" width="420"></td>
+<td><img src="docs/images/pytest-coverage.png" alt="pytest run with coverage summary, 129 passed, 2 skipped, 93.51% total" width="420"></td></tr>
+</table>
+
+![Dashboard on the 66 benchmark findings, served by the backend API from a SQLite DB filled by run_scan](docs/images/dashboard.png)
+
+The dashboard above shows the 66 benchmark findings. They were loaded with
+`python bench/demo.py load-bench`, which runs the real scan job with GitHub
+faked, and served by the backend's `/api/stats`. No triage decisions were
+recorded, so the false-positive rate and time to triage show "—".
+[Vitest coverage output](docs/images/vitest-coverage.png). The raw logs are in
+[`bench/results/logs/`](bench/results/logs).
 
 ## Why
 
