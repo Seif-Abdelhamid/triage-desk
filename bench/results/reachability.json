@@ -1,0 +1,35 @@
+{
+  "findings": 66,
+  "labels": {
+    "tainted": 21,
+    "not_tainted": 45,
+    "unknown": 0
+  },
+  "labels_by_app": {
+    "pygoat": {
+      "not_tainted": 43,
+      "tainted": 16
+    },
+    "Vulnerable-Flask-App": {
+      "tainted": 5
+    },
+    "dvpwa": {
+      "not_tainted": 2
+    }
+  },
+  "timing": {
+    "runs": 5,
+    "per_finding_us_median_of_medians": 1244.0,
+    "per_finding_us_p95_of_medians": 3758.5,
+    "per_finding_us_max_of_medians": 4220.0,
+    "full_pass_ms_median": 103.61,
+    "full_pass_ms_runs": [
+      105.84,
+      102.6,
+      103.22,
+      106.71,
+      103.61
+    ],
+    "note": "reaches(source, line) only; file already in memory; includes ast.parse"
+  }
+}

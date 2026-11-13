@@ -1,0 +1,20 @@
+{
+  "cpu": "Apple M2",
+  "cores": 8,
+  "memory_bytes": 8589934592,
+  "os": "macOS-26.4-arm64-arm-64bit",
+  "python": "3.12.13",
+  "semgrep_cli": "1.185.0",
+  "node": "v22.22.2",
+  "packages": {
+    "triage-desk": "0.1.0",
+    "semgrep": "1.185.0",
+    "pytest": "9.2.0",
+    "pytest-cov": "7.1.0",
+    "coverage": "7.17.3",
+    "sqlalchemy": "2.1.8",
+    "fastapi": "0.141.1",
+    "httpx": "0.28.1"
+  },
+  "project_commit": "0cac66e99aedb2e13f172e0d2ab28698540ac6ae"
+}
