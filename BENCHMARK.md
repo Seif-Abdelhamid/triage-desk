@@ -11,7 +11,9 @@ VIRTUAL_ENV=/tmp/td-venv uv pip install -e "backend[dev]" semgrep coverage pytes
 
 The script clones the apps at the pinned commits into `/tmp/bench`, runs every
 step and writes the raw output to [`bench/results/`](bench/results). The
-hand labels are in [`bench/labels.csv`](bench/labels.csv). Nothing on this
+hand labels are in [`bench/labels.csv`](bench/labels.csv). `python bench/run_benchmark.py --summary` reprints
+the headline table from the saved JSON. The captured pytest, vitest and summary
+output is in [`bench/results/logs/`](bench/results/logs). Nothing on this
 page is estimated or rounded up. Percentages are rounded to one decimal place
 from the raw JSON, and each one gives its sample size.
 
