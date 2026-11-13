@@ -18,9 +18,11 @@
 
 The token is read from the environment only and never written anywhere.
 
-Status: ``load-bench`` and ``serve`` produced docs/images/dashboard.png.
-``scan-pr`` and ``triage`` have NOT yet been run against the live GitHub API
-(creating the public demo repository was not done), so treat them as untested.
+Status: all four commands have been run. ``scan-pr`` and ``triage`` were run
+against the live GitHub API on 2026-11-13 for
+https://github.com/Seif-Abdelhamid/triage-desk-demo/pull/1 (4 review comments
+posted, one /triage false-positive decision applied). ``load-bench`` and
+``serve`` produced docs/images/dashboard.png.
 """
 
 from __future__ import annotations
