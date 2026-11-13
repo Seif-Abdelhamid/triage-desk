@@ -51,3 +51,6 @@ exclude = ["alembic/", "tests/"]
 [[tool.mypy.overrides]]
 module = ["triage_desk.worker"]
 disable_error_code = ["untyped-decorator"]
+
+[tool.coverage.report]
+precision = 2
