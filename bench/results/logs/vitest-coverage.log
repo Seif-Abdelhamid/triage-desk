@@ -1,0 +1,29 @@
+
+ RUN  v5.1.0 /Users/seifabdelhamid/project-lab/projects/triage-desk/dashboard
+      Coverage enabled with v8
+
+
+ Test Files  3 passed (3)
+      Tests  18 passed (18)
+   Start at  19:25:25
+   Duration  1.30s (environment 56%, tests 16%, import 13%, setup 10%, worker 3%, transform 2%)
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   92.95 |    92.85 |     100 |   98.18 |                   
+ src               |   92.68 |    91.66 |     100 |   96.66 |                   
+  App.tsx          |   93.33 |    81.81 |     100 |     100 | 22-23             
+  api.ts           |    90.9 |     90.9 |     100 |     100 | 12                
+  main.tsx         |       0 |      100 |     100 |       0 | 6                 
+ src/components    |   93.33 |    94.11 |     100 |     100 |                   
+  RuleTable.tsx    |   92.59 |    94.11 |     100 |     100 | 18,20             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 92.95% ( 66/71 )
+Branches     : 92.85% ( 65/70 )
+Functions    : 100% ( 21/21 )
+Lines        : 98.18% ( 54/55 )
+================================================================================
