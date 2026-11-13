@@ -58,12 +58,33 @@ The numbers may not hold on production code. See the
 <td><img src="docs/images/pytest-coverage.png" alt="pytest run with coverage summary, 129 passed, 2 skipped, 93.51% total" width="420"></td></tr>
 </table>
 
-![Dashboard on the 66 benchmark findings, served by the backend API from a SQLite DB filled by run_scan](docs/images/dashboard.png)
+## Live demo
 
-The dashboard above shows the 66 benchmark findings. They were loaded with
+On the public pull request
+[Seif-Abdelhamid/triage-desk-demo#1](https://github.com/Seif-Abdelhamid/triage-desk-demo/pull/1),
+triage-desk's scan job (`python bench/demo.py scan-pr`) ran locally against
+the GitHub API and posted 4 inline review comments. Three are on the
+command-injection line, each with the hint "tainted input reaches this line".
+The fourth is an MD5 warning with the hint "no flow from request/input() to
+this line". A reviewer replied
+`/triage false-positive md5 is only an HTTP ETag cache key, not a security use`.
+Processing that reply with `python bench/demo.py triage` recorded one audited
+`false_positive` decision and posted the bot's confirmation. There is no
+hosted bot or webhook here, and the bot and the reviewer use the same GitHub
+account.
+
+![The PR's Files changed view with triage-desk's four inline comments and reachability hints](docs/images/demo-pr-files.png)
+
+![The MD5 thread: the /triage false-positive reply and the bot's "Marked finding #70 as false_positive" response](docs/images/demo-pr-triage.png)
+
+![Dashboard on 70 real findings (66 benchmark + 4 demo PR) with the one recorded triage decision](docs/images/dashboard.png)
+
+The dashboard above reads the backend's `/api/stats` from the same database.
+It holds the 66 benchmark findings, loaded with
 `python bench/demo.py load-bench`, which runs the real scan job with GitHub
-faked, and served by the backend's `/api/stats`. No triage decisions were
-recorded, so the false-positive rate and time to triage show "—".
+faked, plus the 4 findings from the demo PR. Its 100 % false-positive rate and
+52 s median time to triage come from **a single** triage decision, so they show
+that the metrics work. They say nothing about rule quality.
 [Vitest coverage output](docs/images/vitest-coverage.png). The raw logs are in
 [`bench/results/logs/`](bench/results/logs).
 
